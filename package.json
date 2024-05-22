@@ -1,0 +1,14 @@
+{
+  "name": "indiana-marketplace",
+  "version": "1.0.0",
+  "description": "NFT marketplace for Indiana",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2"
+  }
+}
