@@ -2,50 +2,50 @@
 
 pragma solidity ^0.8.0;
 
-import "./CacheManager.sol";
+import "./CardManager.sol";
 
-contract Marketplace is CacheManager {
+contract Marketplace is CardManager {
     uint256 public commissionPercent;
 
-    event CacheSold(uint256 cacheId, address from, address to, uint256 price, uint256 commission);
+    event CardSold(uint256 cardId, address from, address to, uint256 price, uint256 commission);
 
-    modifier isForSale(uint256 _cacheId) {
-        require(caches[_cacheId].forSale, "Attempted to alter a cache that is not listed for sale on the marketplace.");
+    modifier isForSale(uint256 _cardId) {
+        require(cards[_cardId].forSale, "Attempted to alter a card that is not listed for sale on the marketplace.");
         _;
     }
 
-    constructor(address _cacheNFT, uint256 _commissionPercent) CacheManager(_cacheNFT) {
+    constructor(address _cardNFT, uint256 _commissionPercent) CardManager(_cardNFT) {
         commissionPercent = _commissionPercent;
     }
 
-    function buyCache(uint256 _cacheId) public payable isForSale(_cacheId) {
-        Cache storage cache = caches[_cacheId];
-        require(msg.value == cache.price, "Incorrect price sent!");
+    function buyCard(uint256 _cardId) public payable isForSale(_cardId) {
+        Card storage card = cards[_cardId];
+        require(msg.value == card.price, "Incorrect price sent!");
 
         uint256 commission = (msg.value * commissionPercent) / 100;
         uint256 sellerProceeds = msg.value - commission;
 
-        address previousOwner = cache.owner;
-        cache.owner = msg.sender;
-        cache.forSale = false;
+        address previousOwner = card.owner;
+        card.owner = msg.sender;
+        card.forSale = false;
 
-        // Transfer cache
-        userCaches[msg.sender].push(_cacheId);
-        removeUserCache(previousOwner, _cacheId);
+        // Transfer card
+        userCards[msg.sender].push(_cardId);
+        removeUserCard(previousOwner, _cardId);
 
         // Transfer funds
         payable(previousOwner).transfer(sellerProceeds);
         payable(owner()).transfer(commission);
 
-        emit CacheSold(_cacheId, previousOwner, msg.sender, cache.price, commission);
+        emit CardSold(_cardId, previousOwner, msg.sender, card.price, commission);
     }
 
-    function removeUserCache(address _user, uint256 _cacheId) internal {
-        uint256[] storage userCacheList = userCaches[_user];
-        for(uint256 i = 0; i < userCacheList.length; i++) {
-            if(userCacheList[i] == _cacheId) {
-                userCacheList[i] = userCacheList[userCacheList.length - 1];
-                userCacheList.pop();
+    function removeUserCard(address _user, uint256 _cardId) internal {
+        uint256[] storage userCardList = userCards[_user];
+        for(uint256 i = 0; i < userCardList.length; i++) {
+            if(userCardList[i] == _cardId) {
+                userCardList[i] = userCardList[userCardList.length - 1];
+                userCardList.pop();
                 break;
             }
         }
